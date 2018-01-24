@@ -1,5 +1,6 @@
 require 'jekyll/scholar'
 require 'uri'
+require 'font-awesome-sass'
 
 module MarkdownFilter
   class Markdowny < BibTeX::Filter

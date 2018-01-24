@@ -29,7 +29,7 @@ group :jekyll_plugins do
    #   gem "jekyll-archives", "~> 2.1.1" # THIS WAS WAYYYYY TOO SLOW. 370s build.
    #   gem 'jekyll-tagging'              # This was slow too, 210s build.
    gem "jekyll-paginate-v2", "~> 1.9.2"
-
+   gem "font-awesome-sass", "~> 4.7.0"
    gem 'rouge', '~> 1.7'
 end
 
