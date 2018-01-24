@@ -26,7 +26,10 @@ group :jekyll_plugins do
    gem "bibtex-ruby", "~> 4.4.4"
    gem "citeproc-ruby", "~> 1.1.7"
    gem "csl-styles", "~> 1.0.1.8"
-   gem "jekyll-archives", "~> 2.1.1"
+   #   gem "jekyll-archives", "~> 2.1.1" # THIS WAS WAYYYYY TOO SLOW. 370s build.
+   #   gem 'jekyll-tagging'              # This was slow too, 210s build.
+   gem "jekyll-paginate-v2", "~> 1.9.2"
+
    gem 'rouge', '~> 1.7'
 end
 

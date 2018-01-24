@@ -1,5 +1,8 @@
 ---
 layout: default
+pagination:
+  enabled: true
+efn: true
 ---
 
 <div class="home">
@@ -9,7 +12,7 @@ layout: default
   {{ content }}
 
   <ul class="post-list">
-    {% for post in site.posts %}
+    {% for post in paginator.posts %}
       <li>
         {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
         <span class="post-meta">{{ post.date | date: date_format }}</span>
@@ -19,6 +22,22 @@ layout: default
     {% endfor %}
   </ul>
 
+  {% if paginator.total_pages > 1 %}
+  <ul>
+    {% if paginator.previous_page %}
+    <li>
+      <a href="{{ paginator.previous_page_path | prepend: site.baseurl }}">Newer</a>
+    </li>
+    {% endif %}
+    {% if paginator.next_page %}
+    <li>
+      <a href="{{ paginator.next_page_path | prepend: site.baseurl }}">Older</a>
+    </li>
+    {% endif %}
+  </ul>
+  {% endif %}
+
+  
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
 
 </div>
