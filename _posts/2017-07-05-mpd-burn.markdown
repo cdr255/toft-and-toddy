@@ -1,0 +1,85 @@
+---
+layout: post
+title:  "MPD Burn"
+date: 2017-07-05 14:23:48 -0400
+categories: code software
+tags: mpd bash k3b CD playlist
+---
+
+I spent 4 hours yesterday setting up a quick way to take my [MPD][mpd]
+playlists (which are in simple [M3U][m3u]) and burn them to a number
+of audio CDs in [K3B][k3b] (which only
+accepts [extended M3U][extm3u]). I use [Slackware][slackware], so I
+had [KDE][kde] preinstalled, which is why I used the programs I did. I
+might eventually adapt the following script to work with other
+programs as well.
+
+Required programs include the following (most of which come stock in
+Slackware):
+
+### Independent Packages
+* [GNU Bash][bash] (or equivalent)
+* [GNU Coreutils][coreutils]
+* [MPC][mpc]
+* [MPD][mpd]
+* [perl][perl]
+
+### From [KDE][kde]
+* [k3b][k3b]
+* [kdialog][kdialog]
+
+You **need** to set `save_absolute_paths_in_playlists` to `"yes"` in
+`mpd.conf` for this script to work. It also assumes You follow
+FreeDesktop's [XDG User Directories][xdg] defaults and keep Your music
+in `~/Music`.
+
+I straight up lifted the current-playlist-to-extm3u-markup oneliner
+from [here][oneliner]. 
+
+This script *does* create a file in the CWD, but it also asks if You'd
+like to remove it. I did this because, at times, I may want to keep
+the generated playlist for importing into other. If this bothers You,
+You'll have to modify the flow of the script. 
+
+You can also download the script from my [github repo][scriptsrepo].
+
+~~~ bash
+#!/usr/bin/env bash
+
+echo "Opening Current MPD playlist in k3b for burning...";
+
+currtime=$(date +"%F_%T");
+
+echo \#EXTM3U > $currtime-mpdburn-playlist.m3u;
+
+mpc -f "##EXTINF:%time%,%artist% - %title%\n~$HOME/Music/%file%" playlist | perl -F: -p -e 'if (/^#EXTINF/) {$sec=$F[1]*60; $F[2] =~ s/(^.+),/$1/; $sec += $F[2]; s/^.+,(.+)/#EXTINF:$sec,$1/;}' >> $currtime-mpdburn-playlist.m3u;
+
+k3b --audiocd $currtime-mpdburn-playlist.m3u --nosplash
+
+kdialog --yesno "Delete Temporary Extended-M3U playlist?" 
+
+if [ "$?" == 0 ]; then
+    echo "Okay, Deleting $currtime-mpdburn-playlist.m3u"
+    rm -v $currtime-mpdburn-playlist.m3u;
+elif [ "$?" == 1 ]; then
+    echo "Okay, Keeping $currtime-mpdburn-playlist.m3u"
+else
+    kdialog --error "Unexpected Choice."
+fi
+~~~
+
+
+[bash]: https://www.gnu.org/software/bash/ "First scripting language I learned, and my favorite (for now)."
+[coreutils]: https://www.gnu.org/software/coreutils/coreutils.html "GNU doesn't get enough credit for how much it did for FLOSS."
+[extm3u]: https://en.wikipedia.org/wiki/M3U#Extended_M3U "This fragmented spec is stupid, too. Why divide things like that?"
+[k3b]: https://github.com/KDE/k3b "K3B is the most reliable GUI burning program I've found so far."
+[kde]: https://www.kde.org/ "KDE is a bit bloated for me (if I'm honest) but it's good to have when I need it."
+[kdialog]: https://github.com/KDE/kdialog "I almost used zenity, but I wanted to use stock software where I could."
+[m3u]: https://en.wikipedia.org/wiki/M3U "M3U playlists with absolute paths are what my MPD uses."
+[mpc]: https://www.musicpd.org/clients/mpc "I hadn't used this client before, but it's useful for scripting."
+[mpd]: https://www.musicpd.org/ "MPD is what I like to use to listen to music."
+[oneliner]: https://blog.waan.name/create-extended-m3u-playlist-from-mpc-playlist/ "Credit for the oneliner goes 100% to them."
+[perl]: https://www.perl.org/ "One of these days I'll get around to really, really learning PERL."
+[scriptsrepo]: https://github.com/cdr255/scripts "It's pretty barebones, but I suspect this repo to grow."
+[slackware]: http://www.slackware.com/ "Slackware, which I recently migrated back to for the nth time, is awesome."
+[xdg]: https://wiki.archlinux.org/index.php/XDG_user_directories "If You don't follow the spec, You'll need to change the first half of the oneliner."
